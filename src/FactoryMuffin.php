@@ -161,7 +161,7 @@ class FactoryMuffin
     protected function make($name, array $attr, $save)
     {
         $definition = $this->getDefinition($name);
-        $model = $this->makeClass($definition->getClass(), $definition->getMaker());
+        $model = $this->makeClass($definition->getClass(), $definition->getMaker(), $attr);
 
         // Make the object as saved so that other generators persist correctly
         if ($save) {
@@ -182,19 +182,19 @@ class FactoryMuffin
      *
      * @param string        $class The model class name.
      * @param callable|null $maker The maker callable.
-     *
-     * @throws \League\FactoryMuffin\Exceptions\ModelNotFoundException
+     * @param array|null    attr   The model attributes to be used by a maker
      *
      * @return object
+     * @throws ModelNotFoundException
      */
-    protected function makeClass($class, callable $maker = null)
+    protected function makeClass($class, callable $maker = null, array $attr = null)
     {
         if (!class_exists($class)) {
             throw new ModelNotFoundException($class);
         }
 
         if ($maker) {
-            return call_user_func($maker, $class);
+            return call_user_func($maker, $class, $attr);
         }
 
         return new $class();
